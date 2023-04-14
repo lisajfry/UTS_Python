@@ -1,0 +1,168 @@
+import mysql.connector
+// membuat database db_sales_V3922024
+database = mysql.connector.connect(
+    host = 'localhost',
+    user = 'root',
+    database = 'db_sales_V3922027'
+)
+cursorobject = database.cursor()
+// membuat tabel data STOK BARANG
+record="""CREATE TABLE STOK_BARANG(
+            Id_Barang VARCHAR(10) NOT NULL  PRIMARY KEY,
+            Nama_Barang VARCHAR(20) NOT NULL,
+            Harga_Barang INT,
+            Stok_Awal INT,
+            Barang_Masuk INT,
+            Barang_Keluar INT,
+            Stok_Akhir INT
+            )"""
+cursorobject.execute(record)
+
+// membuat format untuk insert data dari tabel yang sudah dibuat
+def insert_data( Id_Barang, Nama_Barang, Harga_Barang, Stok_Awal, Barang_Masuk, Barang_Keluar, Stok_Akhir ):
+    sql = "INSERT INTO Stok_barang (Id_Barang, Nama_Barang, Harga_Barang, Stok_Awal, Barang_Masuk, Barang_Keluar, Stok_Akhir)    VALUES (%s, %s, %s, %s, %s, %s, %s)"
+    val = (Id_Barang, Nama_Barang, Harga_Barang, Stok_Awal, Barang_Masuk, Barang_Keluar, Stok_Akhir)
+    
+    cursorobject.execute(sql, val)
+    database.commit()
+
+    print(" ")
+    print("Data berhasil ditambahkan")
+
+// membuat format untuk menampilkan data dari tabel yang sudah dibuat
+def show_data():
+    query = "SELECT * FROM STOK_BARANG"
+    
+    cursorobject.execute(query)
+
+    myresult = cursorobject.fetchall()
+
+    for x in myresult:
+        print(x)
+        
+    print(" ")
+    print("Data berhasil ditampilkan")
+    
+// membuat format untuk update data dari tabel yang sudah dibuat
+def update_data(Id_Barang, Nama_Barang, Harga_Barang, Stok_Awal, Barang_Masuk, Barang_Keluar, Stok_Akhir):
+    sql = "UPDATE Stok_barang SET Nama_Barang = %s, Harga_Barang = %s, Stok_Awal = %s, Barang_Masuk = %s, Barang_Keluar = %s, Stok_Akhir = %s WHERE Id_Barang = %s"
+    val = (Nama_Barang, Harga_Barang, Stok_Awal, Barang_Masuk, Barang_Keluar, Stok_Akhir, Id_Barang)
+    
+    cursorobject.execute(sql, val)
+    database.commit()
+    
+    print(" ")
+    print("Data berhasil diupdate")
+    
+// membuat format untuk menghapus data dari tabel yang sudah dibuat
+def delete_data(Id_Barang):
+    sql = "DELETE FROM STOK_BARANG WHERE Id_Barang = %s"
+    val = (Id_Barang,)
+    
+    cursorobject.execute(sql, val)
+    database.commit()
+    
+    print(" ")
+    print("Data berhasil dihapus")
+    
+// membuat format untuk search data dari tabel yang sudah dibuat
+def search_data(id_barang):
+    sql = "SELECT * FROM STOK_BARANG WHERE Id_Barang = %s"
+    val = (id_barang,)
+
+    cursorobject.execute(sql, val)
+
+    myresult = cursorobject.fetchall()
+
+    if myresult:
+        print("+------------+----------------------+--------------+-----------+--------------+---------------+------------+")
+        print("| Id Barang  | Nama Barang          | Harga Barang | Stok Awal | Barang Masuk | Barang Keluar | Stok Akhir |")
+        print("+------------+----------------------+--------------+-----------+--------------+---------------+------------+")
+        for row in myresult:
+            print("| {:<10} | {:<20} | {:>12,.2f} | {:>9} | {:>12} | {:>13} | {:>10} |".format(
+                row[0], row[1], row[2], row[3], row[4], row[5], row[6]
+            ))
+        print("+------------+----------------------+--------------+-----------+--------------+---------------+------------+")
+        print("Data berhasil dicari")
+    else:
+        print("Id Barang tidak ditemukan.")
+
+
+// membuat format untuk memilih menu
+while True:
+    print(" ")
+    print("=== APLIKASI DATABASE db_sales_V3922027 ===")
+    print("1. Input Data ")
+    print("2. Tampilkan Data")
+    print("3. Update Data")
+    print("4. Hapus Data")
+    print("5. Cari Data ")
+    print("6. Keluar")
+    print("-------------------")
+    menu = input("Pilih Nomor 1-6 ")
+    print(" ")
+
+// membuat format ketika memilih menu 1    
+    if menu == "1":
+        Id_Barang = input("Masukkan Id Barang : ")
+        Nama_Barang = input("Masukkan Nama Barang : ")
+        Harga_Barang = int(input("Masukkan Harga Barang : "))
+        Stok_Awal = int(input("Masukkan Stok Awal : "))
+        Barang_Masuk = int(input("Masukkan Barang Masuk : "))
+        Barang_Keluar = int(input("Masukkan Barang Keluar : "))
+        
+        Stok_Akhir = Stok_Awal + Barang_Masuk - Barang_Keluar
+        
+        print("Stok Akhir : ", Stok_Akhir)
+        
+        insert_data(Id_Barang, Nama_Barang, Harga_Barang, Stok_Awal, Barang_Masuk, Barang_Keluar, Stok_Akhir)
+    
+  // membuat format ketika memilih menu 2  
+    elif menu == "2":
+        cursorobject.execute("SELECT * FROM STOK_BARANG")
+        data = cursorobject.fetchall()
+        if len(data) == 0:
+            print("Tidak ada data yang tersimpan")
+        else:
+            # printing table headers
+            print("+------------+----------------------+-----------------+------------+-----------------+------------------+------------+")
+            print(f"| {'ID Barang'.ljust(10)} | {'Nama Barang'.ljust(20)} | {'Harga Barang'.ljust(15)} | {'Stok Awal'.ljust(10)} | {'Barang Masuk'.ljust(15)} | {'Barang Keluar'.ljust(15)} | {'Stok Akhir'.ljust(10)} |")
+            print("+------------+----------------------+-----------------+------------+-----------------+------------------+------------+")
+            # printing table rows
+            for row in data:
+                print(f"| {str(row[0]).ljust(10)} | {row[1].ljust(20)} | {str(row[2]).ljust(15)} | {str(row[3]).ljust(10)} | {str(row[4]).ljust(15)} | {str(row[5]).ljust(15)} | {str(row[6]).ljust(10)} |")
+            print("+------------+----------------------+-----------------+------------+-----------------+------------------+------------+")
+
+
+// membuat format ketika memilih menu 3
+    #pilihan 3 "update data"
+    elif menu == "3":
+        Id_Barang = input("Masukkan Id Barang yang akan diupdate : ")
+        Nama_Barang = input("Masukkan Nama Barang baru : ")
+        Harga_Barang = int(input("Masukkan Harga Barang baru : "))
+        Stok_Awal = int(input("Masukkan Stok Awal baru : "))
+        Barang_Masuk = int(input("Masukkan Barang Masuk baru : "))
+        Barang_Keluar = int(input("Masukkan Barang Keluar baru : "))
+        
+        Stok_Akhir = Stok_Awal + Barang_Masuk - Barang_Keluar
+        print("Stok Akhir setelah diupdate : ", Stok_Akhir)
+        
+        update_data(Id_Barang, Nama_Barang, Harga_Barang, Stok_Awal, Barang_Masuk, Barang_Keluar, Stok_Akhir)
+
+// membuat format ketika memilih menu 4
+    elif menu == "4":
+        Id_Barang = input("Masukkan Id Barang yang ingin dihapus : ")
+        
+        delete_data(Id_Barang)
+        
+// membuat format ketika memilih menu 5
+    elif menu == "5":
+        Id_Barang = input("Masukkan Id Barang yang ingin dicari: ")
+        result = search_data(Id_Barang)
+// membuat format keluar ketika memilih menu 6
+    elif menu == "6":
+        print("Keluar")
+        break
+
+    else:
+        print("Menu salah")
